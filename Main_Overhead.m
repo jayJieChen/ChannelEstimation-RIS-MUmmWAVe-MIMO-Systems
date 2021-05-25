@@ -1,8 +1,8 @@
 clc
 clear
 close all
-%% Code of the paper : （Figure 4）
-%J. Chen, Y.-C. Liang, H. V. Cheng, and W. Yu, “Channel estimation for%reconfigurable intelligent surface aided multi-user mimo systems,” IEEEb Trans. Wireless Commun., 2021(accept).
+%% Code of the paper : Figure 4
+%J. Chen, Y.-C. Liang, H. Cheng, and W. Yu, “Channel estimation for%reconfigurable intelligent surface aided multi-user mimo systems,” IEEEb Trans. Wireless Commun., 2021(accept).
 %%
 Channel_realization=50;% The numer of Monte Carlo Trials
 ParameterB=[ 8 24  40   72   128 ];% The numer of subframes
