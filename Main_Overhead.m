@@ -1,13 +1,13 @@
 clc
 clear
 close all
-%% Code of the paper : £®Figure 4£©
-%J. Chen, Y.-C. Liang, H. V. Cheng, and W. Yu, °∞Channel estimation for reconfigurable intelligent surface aided multi-user mimo systems,°± TWC,2020
+%% Code of the paper : ÔºàFigure 4Ôºâ
+%J. Chen, Y.-C. Liang, H. V. Cheng, and W. Yu, ‚ÄúChannel estimation for%reconfigurable intelligent surface aided multi-user mimo systems,‚Äù IEEEb Trans. Wireless Commun., 2021(accept).
 %%
-Channel_realization=10;% The numer of Monte Carlo Trials
+Channel_realization=50;% The numer of Monte Carlo Trials
 ParameterB=[ 8 24  40   72   128 ];% The numer of subframes
 System.NM=128; % The number of antennas at the BS
-System.NL=64;  % The numer of reflective elements at the RIS
+System.NL=128;  % The numer of reflective elements at the RIS
 System.K=4;  % The numer of users
 System.SNR=10.^(10/10); % Transmit power 10db
 System.Gr=512; % AoA Dictionary Angular Resolutions
@@ -38,15 +38,14 @@ for ite_channel=1:1:Channel_realization
     nmse_SMJCE=zeros(1,length(ParameterB));
     nmse_LS_gen_subspace=zeros(1,length(ParameterB));
     [F,H,GenieaidedAoA,GenieaidedAoD]=ChannelGenralize(System) ;
-    % BS-RIS channel, RIS user channel, exact AoAs and exact AoDs for
-    % S-genieaided LS
+    % BS-RIS channel, RIS user channel, exact AoAs and exact AoDs for S-genieaided LS
     
     for ite_index=1:1:length(ParameterB)
         N_bpilot=ParameterB(ite_index);
         % System.N_bpilot=N_bpilot;
-        % V=RIS_SequenceOptimization(System,N_bpilot); %RIS Reflection Coefficient Matrix
+        % V=RIS_SequenceOptimization(System,N_bpilot); %RIS Reflection Coefficient Optimization  
          LISpilot=sqrt(0.5)*(normrnd(0,1,NL,N_bpilot) + 1j*normrnd(0,1,NL,N_bpilot));% 
-        while rank(LISpilot)<N_bpilot
+        while rank(LISpilot)<min(N_bpilot,NL)
             LISpilot=sqrt(0.5)*(normrnd(0,1,NL,N_bpilot) + 1j*normrnd(0,1,NL,N_bpilot)); 
         end
         LISpilot=LISpilot./abs(LISpilot);
@@ -68,7 +67,7 @@ for ite_channel=1:1:Channel_realization
         end
         %% Proposed Algorithm =====================================
         [NMSE_SMJCE,NMSE_SMMV]=SMJCE( Yk, YkHermite,V,G,System,N_bpilot);
-        nmse_SMJCE(1,ite_index)=NMSE_SMJCE
+        nmse_SMJCE(1,ite_index)=NMSE_SMJCE; %The NMSE performance of the proposed algorithm.
         nmse_SMMV(1,ite_index)=NMSE_SMMV;
         
         %% Estimtated Error by Subspace Gen aided LS================
@@ -90,7 +89,7 @@ for ite_channel=1:1:Channel_realization
     NMSE_LS_gen_subspace(ite_channel,:)=nmse_LS_gen_subspace;
     NMSE_SMMVAll(ite_channel,:)=nmse_SMMV;
     NMSE_SMJCEAll(ite_channel,:)=nmse_SMJCE;
-    fprintf('%dth signal is done...................\n',ite_channel)
+    fprintf('%dth channel is done...................\n',ite_channel)
 end
 
 NMSE_LS_gen_subspace_av=sum(NMSE_LS_gen_subspace(1:Channel_realization,:),1)./Channel_realization;
@@ -104,7 +103,7 @@ semilogy(ParameterB,NMSE_SMMV_av,'-bp','LineWidth',1.4,'MarkerSize',8);
 hold on
 semilogy(ParameterB,NMSE_SMJCE_av,'-kp','LineWidth',1.4,'MarkerSize',8);
 semilogy(ParameterB,NMSE_LS_gen_subspace_av,'-rp','LineWidth',1.4,'MarkerSize',8);
-legend('S-MMV','SMJCE','S-Genie aided LS')
+legend('S-MMV','S-MJCE','S-Genie aided LS')
 ylabel('NMSE')
 xlabel('Training overhead {\itB}')
 grid on
